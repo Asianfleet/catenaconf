@@ -70,3 +70,21 @@ Catenaconf.resolve(cfg)
 ```python
 dict_config = Catenaconf.to_container(cfg)
 ```
+
+## Catenaconf 类功能
+
+- `create(config: dict) -> DictConfig`: 创建一个 `DictConfig` 实例。
+- `update(cfg: DictConfig, key: str, value: Any = None, *, merge: bool = True) -> None`: 更新配置，支持嵌套更新。
+- `merge(*configs) -> DictConfig`: 合并多个配置，返回合并后的 `DictConfig` 实例。
+- `resolve(cfg: DictConfig) -> None`: 解析配置中的引用。
+- `to_container(cfg: DictConfig) -> dict`: 将 `DictConfig` 实例转换为普通字典。
+
+## DictConfig 类特性
+
+`DictConfig` 类是对 Python 内置 `dict` 类的扩展，增加了以下特性：
+
+- 支持通过属性访问字典项。
+- 自动将嵌套字典转换为 `DictConfig` 实例。
+- 支持深拷贝。
+- 支持解析引用。
+- 提供方法将 `DictConfig` 实例转换为普通字典。
