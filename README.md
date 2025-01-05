@@ -1,21 +1,20 @@
-<!-- markdownlint-disable MD024 -->
 # Catenaconf
 
-Catenaconf 是一个用于管理和操作配置的 Python 包。它提供了创建、更新、合并和解析配置的功能。
+Catenaconf is a Python package for managing and operating configurations. It provides functionalities for creating, updating, merging, and parsing configurations.
 
-## 安装
+## Installation
 
-使用 pip 安装：
+Install using pip:
 
 ```bash
 pip install catenaconf
 ```
 
-## 使用方法
+## Usage
 
-### 创建配置
+### Create Configuration
 
-使用 `Catenaconf.create` 方法创建一个 `DictConfig` 实例：
+Use the `Catenaconf.create` method to create a `DictConfig` instance:
 
 ```python
 from catenaconf.ops import Catenaconf
@@ -30,17 +29,17 @@ config = {
 cfg = Catenaconf.create(config)
 ```
 
-### 更新配置
+### Update Configuration
 
-使用 `Catenaconf.update` 方法更新配置：
+Use the `Catenaconf.update` method to update the configuration:
 
 ```python
 Catenaconf.update(cfg, "database.user", "root")
 ```
 
-### 合并配置
+### Merge Configurations
 
-使用 `Catenaconf.merge` 方法合并多个配置：
+Use the `Catenaconf.merge` method to merge multiple configurations:
 
 ```python
 config1 = {"database": {"host": "localhost"}}
@@ -49,9 +48,9 @@ config2 = {"database": {"port": 3306}}
 merged_cfg = Catenaconf.merge(config1, config2)
 ```
 
-### 解析配置
+### Resolve Configuration
 
-使用 `Catenaconf.resolve` 方法解析配置中的引用：
+Use the `Catenaconf.resolve` method to resolve references in the configuration:
 
 ```python
 config = {
@@ -63,28 +62,29 @@ cfg = Catenaconf.create(config)
 Catenaconf.resolve(cfg)
 ```
 
-### 转换为字典
+### Convert to Dictionary
 
-使用 `Catenaconf.to_container` 方法将 `DictConfig` 实例转换为普通字典：
+Use the `Catenaconf.to_container` method to convert a `DictConfig` instance to a regular dictionary:
 
 ```python
 dict_config = Catenaconf.to_container(cfg)
 ```
 
-## Catenaconf 类功能
+## Catenaconf Class Features
 
-- `create(config: dict) -> DictConfig`: 创建一个 `DictConfig` 实例。
-- `update(cfg: DictConfig, key: str, value: Any = None, *, merge: bool = True) -> None`: 更新配置，支持嵌套更新。
-- `merge(*configs) -> DictConfig`: 合并多个配置，返回合并后的 `DictConfig` 实例。
-- `resolve(cfg: DictConfig) -> None`: 解析配置中的引用。
-- `to_container(cfg: DictConfig) -> dict`: 将 `DictConfig` 实例转换为普通字典。
+- `create(config: dict) -> DictConfig`: Creates a `DictConfig` instance.
+- `update(cfg: DictConfig, key: str, value: Any = None, *, merge: bool = True) -> None`: Updates the configuration, supporting nested updates.
+- `merge(*configs) -> DictConfig`: Merges multiple configurations and returns a merged `DictConfig` instance.
+- `resolve(cfg: DictConfig) -> None`: Resolves references in the configuration.
+- `to_container(cfg: DictConfig) -> dict`: Converts a `DictConfig` instance to a regular dictionary.
 
-## DictConfig 类特性
+## DictConfig Class Features
 
-`DictConfig` 类是对 Python 内置 `dict` 类的扩展，增加了以下特性：
+The `DictConfig` class extends Python's built-in `dict` class with the following features:
 
-- 支持通过属性访问字典项。
-- 自动将嵌套字典转换为 `DictConfig` 实例。
-- 支持深拷贝。
-- 支持解析引用。
-- 提供方法将 `DictConfig` 实例转换为普通字典。
+- Supports accessing dictionary items via attributes.
+- Automatically converts nested dictionaries to `DictConfig` instances.
+- Supports deep copying.
+- Supports resolving references.
+- Provides methods to convert `DictConfig` instances to regular dictionaries.
+  
