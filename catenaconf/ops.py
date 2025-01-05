@@ -5,7 +5,7 @@ from .catena_config.dictconfig import DictConfig
 class Catenaconf:
     @staticmethod
     def create(config: dict) -> DictConfig:
-        """ 创建一个 DictConfig 实例 """
+        """ Create a DictConfig instance """
         return DictConfig(config)
 
     @staticmethod
