@@ -1,7 +1,7 @@
 import unittest
 from catenaconf import Catenaconf, DictConfig
 
-class TestCatenaconf(unittest.TestCase):
+class BaseCatenaconfTestCase(unittest.TestCase):
     def setUp(self):
         self.test_config = {
             "config": {
@@ -18,32 +18,35 @@ class TestCatenaconf(unittest.TestCase):
         }
         self.dt = Catenaconf.create(self.test_config)
 
+
+class TestCatenaconfCreation(BaseCatenaconfTestCase):
+    """ test the creation of Catenaconf """
     def test_create(self):
         self.assertIsInstance(self.dt, DictConfig)
 
+
+class TestCatenaconfResolution(BaseCatenaconfTestCase):
+    """ test the resolution of Catenaconf """
     def test_resolve(self):
         Catenaconf.resolve(self.dt)
         self.assertEqual(self.dt["config"]["connection"], "Host: localhost, Port: 5432")
         self.assertEqual(self.dt["app"]["info"], "App Version: 1.0.0, Connection: Host: localhost, Port: 5432")
 
+    def test_resolve_with_references(self):
+        Catenaconf.update(self.dt, "config.database.host", "127.0.0.1")
+        Catenaconf.resolve(self.dt)
+        self.assertEqual(self.dt["config"]["connection"], "Host: 127.0.0.1, Port: 5432")
+
+
+class TestCatenaconfUpdate(BaseCatenaconfTestCase):
+    """ test the update of Catenaconf """
     def test_update(self):
         Catenaconf.update(self.dt, "config.database.host", "123")
         self.assertEqual(self.dt.config.database.host, "123")
-    
+
     def test_update_non_existent_key(self):
         Catenaconf.update(self.dt, "config.database.username", "admin")
         self.assertEqual(self.dt.config.database.username, "admin")
-
-    def test_merge(self):
-        ds = Catenaconf.merge(self.dt, {"new_key": "new_value"})
-        self.assertIn("new_key", ds)
-        self.assertEqual(ds["new_key"], "new_value")
-
-    def test_merge_conflict(self):
-        original = {"key": "original_value"}
-        new = {"key": "new_value"}
-        merged = Catenaconf.merge(original, new)
-        self.assertEqual(merged["key"], "new_value")
 
     def test_update_with_merge(self):
         Catenaconf.update(self.dt, "config.database", {"host": "127.0.0.1", "port": 3306}, merge=True)
@@ -55,6 +58,69 @@ class TestCatenaconf(unittest.TestCase):
         self.assertEqual(self.dt.config.database.host, "127.0.0.1")
         self.assertEqual(self.dt.config.database.port, 3306)
 
+    def test_update_with_non_dict_without_merge(self):
+        Catenaconf.update(self.dt, "config.database", "new_value", merge=False)
+        self.assertEqual(self.dt.config.database, "new_value")
+
+    def test_update_with_new_key_with_merge(self):
+        Catenaconf.update(self.dt, "config.database.username", "admin", merge=True)
+        self.assertEqual(self.dt.config.database.username, "admin")
+
+
+class TestCatenaconfMerge(BaseCatenaconfTestCase):
+    """ test the merge of Catenaconf """
+    def test_merge(self):
+        ds = Catenaconf.merge(self.dt, {"new_key": "new_value"})
+        self.assertIn("new_key", ds)
+        self.assertEqual(ds["new_key"], "new_value")
+
+    def test_merge_conflict(self):
+        original = {"key": "original_value"}
+        new = {"key": "new_value"}
+        merged = Catenaconf.merge(original, new)
+        self.assertEqual(merged["key"], "new_value")
+        
+    def test_merge_nested_dictionaries(self):
+        original = {
+            "config": {
+                "database": {
+                    "host": "localhost",
+                    "port": 5432
+                },
+                "settings": {
+                    "timeout": 30
+                }
+            }
+        }
+        new = {
+            "config": {
+                "database": {
+                    "username": "admin"
+                },
+                "settings": {
+                    "retry": 3
+                }
+            }
+        }
+        expected = {
+            "config": {
+                "database": {
+                    "host": "localhost",
+                    "port": 5432,
+                    "username": "admin"
+                },
+                "settings": {
+                    "timeout": 30,
+                    "retry": 3
+                }
+            }
+        }
+
+        merged = Catenaconf.merge(DictConfig(original), DictConfig(new))
+        self.assertEqual(Catenaconf.to_container(merged), expected)
+
+
+class TestDictConfigMethods(BaseCatenaconfTestCase):
     def test_to_container(self):
         container = Catenaconf.to_container(self.dt)
         self.assertIsInstance(container, dict)
@@ -85,10 +151,6 @@ class TestCatenaconf(unittest.TestCase):
         self.assertIn("config.database.host", refs)
         self.assertIn("config.database.port", refs)
 
-    def test_resolve_with_references(self):
-        Catenaconf.update(self.dt, "config.database.host", "127.0.0.1")
-        Catenaconf.resolve(self.dt)
-        self.assertEqual(self.dt["config"]["connection"], "Host: 127.0.0.1, Port: 5432")
 
 if __name__ == '__main__':
     unittest.main()
