@@ -2,17 +2,15 @@ from setuptools import setup, find_packages
 
 setup(
     name='catenaconf',
-    version='0.0.1',
+    version='0.1.0',
     packages=find_packages(),
-    install_requires=[
-        # 如果有其他依赖项，可以在这里列出
-    ],
+    install_requires=[],
     description='A configuration management library',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     author='Jianqing Wang',
-    author_email='1239326528@qq.com',
-    url='https://github.com/yourusername/catenaconf',  # 如果有的话
+    author_email='18353419066@163.com',
+    url='https://github.com/Asianfleet/catenaconf',
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
