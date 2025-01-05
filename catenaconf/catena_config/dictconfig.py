@@ -24,7 +24,8 @@ class DictConfig(dict):
     def __setattr__(self, key, value):
         if key.startswith('__') and key.endswith('__'):
             super().__setattr__(key, value)
-        else:   # Ensure that after adding new attributes, they will also be converted to DictConfig type
+        else: 
+            # Ensure that after adding new attributes, they will also be converted to DictConfig type
             if isinstance(value, dict):
                 value = DictConfig(value)
             elif isinstance(value, list):
@@ -53,7 +54,7 @@ class DictConfig(dict):
         return self.__getallref__()
     
     def __getallref__(self):
-        return re.findall(r'@\{(.*)\}', self.__str__())
+        return re.findall(r'@\{(.*?)\}', self.__str__())
     
     @property
     def __container__(self) -> dict:

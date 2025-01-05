@@ -35,5 +35,45 @@ class TestCatenaconf(unittest.TestCase):
         self.assertIn("new_key", ds)
         self.assertEqual(ds["new_key"], "new_value")
 
+    def test_update_with_merge(self):
+        Catenaconf.update(self.dt, "config.database", {"host": "127.0.0.1", "port": 3306}, merge=True)
+        self.assertEqual(self.dt.config.database.host, "127.0.0.1")
+        self.assertEqual(self.dt.config.database.port, 3306)
+
+    def test_update_without_merge(self):
+        Catenaconf.update(self.dt, "config.database", {"host": "127.0.0.1", "port": 3306}, merge=False)
+        self.assertEqual(self.dt.config.database.host, "127.0.0.1")
+        self.assertEqual(self.dt.config.database.port, 3306)
+
+    def test_to_container(self):
+        container = Catenaconf.to_container(self.dt)
+        self.assertIsInstance(container, dict)
+        self.assertEqual(container["config"]["database"]["host"], "localhost")
+
+    def test_dictconfig_getattr(self):
+        self.assertEqual(self.dt.config.database.host, "localhost")
+        with self.assertRaises(AttributeError):
+            _ = self.dt.config.database.invalid_key
+
+    def test_dictconfig_setattr(self):
+        self.dt.config.database.new_key = "new_value"
+        self.assertEqual(self.dt.config.database.new_key, "new_value")
+
+    def test_dictconfig_delattr(self):
+        del self.dt.config.database.host
+        with self.assertRaises(AttributeError):
+            _ = self.dt.config.database.host
+
+    def test_dictconfig_deepcopy(self):
+        dt_copy = self.dt.deepcopy
+        self.assertEqual(dt_copy.config.database.host, "localhost")
+        dt_copy.config.database.host = "127.0.0.1"
+        self.assertNotEqual(self.dt.config.database.host, dt_copy.config.database.host)
+
+    def test_dictconfig_getallref(self):
+        refs = self.dt.__ref__
+        self.assertIn("config.database.host", refs)
+        self.assertIn("config.database.port", refs)
+
 if __name__ == '__main__':
     unittest.main()

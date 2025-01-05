@@ -29,7 +29,10 @@ class Catenaconf:
             else:
                     current[last_key] = value
         else:
-            current[last_key] = value
+            if isinstance(value, dict):
+                current[last_key] = DictConfig(value)
+            else:
+                current[last_key] = value
 
     @staticmethod
     def merge(*configs) -> DictConfig:
