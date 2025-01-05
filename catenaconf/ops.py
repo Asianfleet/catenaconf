@@ -17,15 +17,16 @@ class Catenaconf:
                 current[k] = {}
             current = current[k]
         last_key = keys[-1]
-        print("last_key:", last_key)
+
         if merge:
             if isinstance(current.get(last_key, DictConfig({})), DictConfig):
                 if isinstance(value, dict) or isinstance(value, DictConfig):
                     for k, v in value.items():
-                        print("k:", k)
                         current[last_key][k] = v
                     current[last_key] = DictConfig(current[last_key])
                 else:
+                    current[last_key] = value
+            else:
                     current[last_key] = value
         else:
             current[last_key] = value
@@ -69,3 +70,39 @@ class Catenaconf:
     @staticmethod
     def to_container(cfg: DictConfig) -> dict:
         return cfg.__to_container__()
+    
+
+
+if __name__ == "__main__":
+    
+    test = {
+        "config": {
+            "database": {
+                "host": "localhost",
+                "port": 5432
+            },
+            "connection": "Host: @{config.database.host}, Port: @{config.database.port}"
+        },
+        "app": {
+            "version": "1.0.0",
+            "info": "App Version: @{app.version}, Connection: @{config.connection}"
+        }
+    }
+    
+    print(test)
+
+    dt = Catenaconf.create(test)
+    Catenaconf.resolve(dt)
+    print(dt)
+
+    dt.config.database.host = "123"
+    print(dt)
+
+    Catenaconf.update(dt, "config.database", {"123": "123"})
+    print(dt)
+
+    ds = Catenaconf.merge(dt, {"new_key": "new_value"})
+    print(ds)
+    
+    Catenaconf.update(dt, "config.database.host", "4567")
+    print(dt)

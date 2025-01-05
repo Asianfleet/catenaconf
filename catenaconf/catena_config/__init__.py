@@ -1,3 +1,3 @@
-from dictconfig import DictConfig
+from .dictconfig import DictConfig
 
 __all__ = ['DictConfig']
