@@ -29,11 +29,21 @@ class TestCatenaconf(unittest.TestCase):
     def test_update(self):
         Catenaconf.update(self.dt, "config.database.host", "123")
         self.assertEqual(self.dt.config.database.host, "123")
+    
+    def test_update_non_existent_key(self):
+        Catenaconf.update(self.dt, "config.database.username", "admin")
+        self.assertEqual(self.dt.config.database.username, "admin")
 
     def test_merge(self):
         ds = Catenaconf.merge(self.dt, {"new_key": "new_value"})
         self.assertIn("new_key", ds)
         self.assertEqual(ds["new_key"], "new_value")
+
+    def test_merge_conflict(self):
+        original = {"key": "original_value"}
+        new = {"key": "new_value"}
+        merged = Catenaconf.merge(original, new)
+        self.assertEqual(merged["key"], "new_value")
 
     def test_update_with_merge(self):
         Catenaconf.update(self.dt, "config.database", {"host": "127.0.0.1", "port": 3306}, merge=True)
@@ -74,6 +84,11 @@ class TestCatenaconf(unittest.TestCase):
         refs = self.dt.__ref__
         self.assertIn("config.database.host", refs)
         self.assertIn("config.database.port", refs)
+
+    def test_resolve_with_references(self):
+        Catenaconf.update(self.dt, "config.database.host", "127.0.0.1")
+        Catenaconf.resolve(self.dt)
+        self.assertEqual(self.dt["config"]["connection"], "Host: 127.0.0.1, Port: 5432")
 
 if __name__ == '__main__':
     unittest.main()
