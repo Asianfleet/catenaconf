@@ -63,8 +63,8 @@ class TestCatenaconfUpdate(BaseCatenaconfTestCase):
         self.assertEqual(self.dt.config.database, "new_value")
 
     def test_update_with_new_key_with_merge(self):
-        Catenaconf.update(self.dt, "test", "admin", merge=True)
-        self.assertEqual(self.dt.test, "admin")
+        Catenaconf.update(self.dt, "test.test", "admin", merge=True)
+        self.assertEqual(self.dt.test.test, "admin")
 
 
 class TestCatenaconfMerge(BaseCatenaconfTestCase):

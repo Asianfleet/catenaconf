@@ -14,8 +14,7 @@ class Catenaconf:
         current = cfg
         for k in keys[:-1]:
             if k not in current:
-                current[k] = {}
-                print("k not in current")
+                current[k] = DictConfig({})
             current = current[k]
         last_key = keys[-1]
 
