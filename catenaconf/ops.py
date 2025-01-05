@@ -76,7 +76,7 @@ class Catenaconf:
     
 
 
-if __name__ == "__main__":
+""" if __name__ == "__main__":
     
     test = {
         "config": {
@@ -108,4 +108,4 @@ if __name__ == "__main__":
     print(ds)
     
     Catenaconf.update(dt, "config.database.host", "4567")
-    print(dt)
+    print(dt) """
