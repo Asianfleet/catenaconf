@@ -1,5 +1,5 @@
 import unittest
-from catenaconf import Catenaconf, DictConfig
+from ..catenaconf import Catenaconf, DictConfig
 
 class TestCatenaconf(unittest.TestCase):
     def setUp(self):
