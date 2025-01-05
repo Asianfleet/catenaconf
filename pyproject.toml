@@ -7,7 +7,7 @@ name = "catenaconf"
 version = "0.1.0"
 description = "A configuration management library"
 authors = [
-    { name="Jianqing Wang", email="18353419066@163.com" }
+    { name = "Jianqing Wang", email = "18353419066@163.com" }
 ]
 dependencies = []
 readme = "README.md"
