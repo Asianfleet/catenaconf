@@ -30,6 +30,7 @@ class TestDictConfig(BaseCatenaconfTestCase):
         self.dt.__a__ = "a"
         self.dt.__b__ = "b"
         self.dt.b = {"c": "d"}
+        self.dt.c = {"d": "e"}
         self.dt.e = [1, 2, 3]
         del self.dt.__b__
         self.dt.__to_container__()
