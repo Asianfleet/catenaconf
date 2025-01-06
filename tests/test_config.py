@@ -1,5 +1,5 @@
 import unittest
-from catenaconf import Catenaconf, DictConfig
+from catenaconf import Catenaconf, KvConfig
 
 class BaseCatenaconfTestCase(unittest.TestCase):
     def setUp(self):
@@ -20,11 +20,11 @@ class BaseCatenaconfTestCase(unittest.TestCase):
 
 
 class TestDictConfig(BaseCatenaconfTestCase):
-    """ test the DictConfig class """
+    """ test the KvConfig class """
     def test_get_underlined_key(self):
         test = {"__class__": "test"}
-        dt = DictConfig(test)
-        self.assertEqual(dt.__class__, DictConfig)
+        dt = KvConfig(test)
+        self.assertEqual(dt.__class__, KvConfig)
         
     def test_set_underlined_key(self):
         self.dt.__a__ = "a"
@@ -37,14 +37,15 @@ class TestDictConfig(BaseCatenaconfTestCase):
         self.assertEqual(self.dt.__a__, "a")
         self.assertEqual(type(self.dt.__container__), dict)
   
+  
 class TestCatenaconfCreation(BaseCatenaconfTestCase):
     """ test the creation of Catenaconf """
     def test_create(self):
-        self.assertIsInstance(self.dt, DictConfig)
+        self.assertIsInstance(self.dt, KvConfig)
         
     def test_create_with__list(self):
         dt = Catenaconf.create({"test": [1, 2, 3]})
-        self.assertIsInstance(dt, DictConfig)
+        self.assertIsInstance(dt, KvConfig)
         
 
 class TestCatenaconfResolution(BaseCatenaconfTestCase):
@@ -138,7 +139,7 @@ class TestCatenaconfMerge(BaseCatenaconfTestCase):
             }
         }
 
-        merged = Catenaconf.merge(DictConfig(original), DictConfig(new))
+        merged = Catenaconf.merge(KvConfig(original), KvConfig(new))
         self.assertEqual(Catenaconf.to_container(merged), expected)
 
 

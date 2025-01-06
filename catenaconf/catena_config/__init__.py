@@ -1,3 +1,3 @@
-from .dictconfig import DictConfig
+from .kvconfig import KvConfig
 
-__all__ = ['DictConfig']
+__all__ = ['KvConfig']

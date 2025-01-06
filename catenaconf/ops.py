@@ -1,56 +1,56 @@
 import re
 from typing import Any
-from .catena_config.dictconfig import DictConfig
+from .catena_config.kvconfig import KvConfig
 
 class Catenaconf:
     @staticmethod
-    def create(config: dict) -> DictConfig:
-        """ Create a DictConfig instance """
-        return DictConfig(config)
+    def create(config: dict) -> KvConfig:
+        """ Create a KvConfig instance """
+        return KvConfig(config)
 
     @staticmethod
-    def update(cfg: DictConfig, key: str, value: Any = None, *, merge: bool = True) -> None:
+    def update(cfg: KvConfig, key: str, value: Any = None, *, merge: bool = True) -> None:
         keys = key.split('.')
         current = cfg
         for k in keys[:-1]:
             if k not in current:
-                current[k] = DictConfig({})
+                current[k] = KvConfig({})
             current = current[k]
         last_key = keys[-1]
 
         if merge:
-            if isinstance(current.get(last_key, DictConfig({})), DictConfig):
-                if isinstance(value, dict) or isinstance(value, DictConfig):
+            if isinstance(current.get(last_key, KvConfig({})), KvConfig):
+                if isinstance(value, dict) or isinstance(value, KvConfig):
                     for k, v in value.items():
                         current[last_key][k] = v
-                    current[last_key] = DictConfig(current[last_key])
+                    current[last_key] = KvConfig(current[last_key])
                 else:
                     current[last_key] = value
             else:
                     current[last_key] = value
         else:
             if isinstance(value, dict):
-                current[last_key] = DictConfig(value)
+                current[last_key] = KvConfig(value)
             else:
                 current[last_key] = value
 
     @staticmethod
-    def merge(*configs) -> DictConfig:
+    def merge(*configs) -> KvConfig:
         
-        def merge_into(target: DictConfig, source: DictConfig) -> None:
+        def merge_into(target: KvConfig, source: KvConfig) -> None:
             for key, value in source.items():
                 if isinstance(value, dict) and key in target and isinstance(target[key], dict):
                     merge_into(target[key], value)
                 else:
                     target[key] = value
                     
-        merged_config = DictConfig({})
+        merged_config = KvConfig({})
         for config in configs:
-            merge_into(merged_config, DictConfig(config))
-        return DictConfig(merged_config)
+            merge_into(merged_config, KvConfig(config))
+        return KvConfig(merged_config)
 
     @staticmethod
-    def resolve(cfg: DictConfig) -> None:
+    def resolve(cfg: KvConfig) -> None:
         capture_pattern = r'@\{(.*?)\}'
         def de_ref(captured):
             ref:str = captured.group(1)
@@ -59,9 +59,9 @@ class Catenaconf:
                 target = target[part]
             return str(target)
 
-        def sub_resolve(input: DictConfig):
+        def sub_resolve(input: KvConfig):
             for key, value in input.items():
-                if isinstance(value, DictConfig):
+                if isinstance(value, KvConfig):
                     sub_resolve(value)
                 elif isinstance(value, str):
                     if re.search(capture_pattern, value):
@@ -71,8 +71,14 @@ class Catenaconf:
         sub_resolve(cfg)
 
     @staticmethod
-    def to_container(cfg: DictConfig) -> dict:
-        return cfg.__to_container__()
+    def to_container(cfg: KvConfig, resolve = True) -> dict:
+        """ convert KvConfig instance to a normal dict and output. """
+        if resolve:
+            cfg_copy = cfg.deepcopy
+            Catenaconf.resolve(cfg_copy)
+            return cfg_copy.__to_container__()
+        else:
+            return cfg.__to_container__()
     
 
 

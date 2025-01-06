@@ -1,1 +1,6 @@
 __pycache__/
+.vscode/
+build/
+dist/
+catenaconf.egg-info/
+.pypirc

@@ -1,4 +1,4 @@
 from .ops import Catenaconf
-from .catena_config import DictConfig
+from .catena_config import KvConfig
 
-__all__ = ["Catenaconf", "DictConfig"]
+__all__ = ["Catenaconf", "KvConfig"]

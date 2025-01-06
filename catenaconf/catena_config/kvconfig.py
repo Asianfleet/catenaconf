@@ -1,28 +1,28 @@
 import copy
 import re
 
-class DictConfig(dict):
+class KvConfig(dict):
     def __init__(self, *args, **kwargs):
-        """ Initialize the DictConfig class, and the internal nested dictionary will also be converted to the DictConfig type """
+        """ Initialize the KvConfig class, and the internal nested dictionary will also be converted to the KvConfig type """
         super().__init__(*args, **kwargs)
         for key, value in self.items():
             if isinstance(value, dict):
-                self[key] = DictConfig(value)
+                self[key] = KvConfig(value)
             elif isinstance(value, list):
-                self[key] = [DictConfig(item) if isinstance(item, dict) else item for item in value]
+                self[key] = [KvConfig(item) if isinstance(item, dict) else item for item in value]
 
-    # TODO: the DictConfig class may have special attributes with underlines, 
+    # TODO: the KvConfig class may have special attributes with underlines, 
     # which can't accessd by super().__getattr__(key)
     def __getattr__(self, key):
         """ Get the value of the key """
         
-        # Till now I couldn't figure out the meaning of the following two lines of code
+        # The following two lines of code seems to be useless
         """ if key.startswith('__') and key.endswith('__'):
             return super().__getattr__(key) """
 
         try:
             value = self[key]
-            # Return directly (the init function ensures that it is already of DictConfig type)
+            # Return directly (the init function ensures that it is already of KvConfig type)
             return value
         except KeyError:
             raise AttributeError(f"'{type(self).__name__}' object has no attribute '{key}'")
@@ -34,11 +34,11 @@ class DictConfig(dict):
         if key.startswith('__') and key.endswith('__'):
             super().__setattr__(key, value)
         else: 
-            # Ensure that after adding new attributes, they will also be converted to DictConfig type
+            # Ensure that after adding new attributes, they will also be converted to KvConfig type
             if isinstance(value, dict):
-                value = DictConfig(value)
+                value = KvConfig(value)
             elif isinstance(value, list):
-                value = [DictConfig(item) if isinstance(item, dict) else item for item in value]
+                value = [KvConfig(item) if isinstance(item, dict) else item for item in value]
         
             self[key] = value
 
@@ -49,13 +49,13 @@ class DictConfig(dict):
             del self[key]
 
     def __deepcopy__(self, memo):
-        """ Make a deep copy of an instance of the DictConfig class """
+        """ Make a deep copy of an instance of the KvConfig class """
         # Use the default dict copying method to avoid infinite recursion.
-        return DictConfig(copy.deepcopy(dict(self), memo))
+        return KvConfig(copy.deepcopy(dict(self), memo))
 
     @property
     def deepcopy(self):
-        """ Make a deep copy of an instance of the DictConfig class """
+        """ Make a deep copy of an instance of the KvConfig class """
         return copy.deepcopy(self)  
     
     @property
@@ -67,15 +67,15 @@ class DictConfig(dict):
     
     @property
     def __container__(self) -> dict:
-        """ Copy the DictConfig instance, convert it to a normal dict and output """
+        """ Copy the KvConfig instance, convert it to a normal dict and output """
         return self.__to_container__()
 
     def __to_container__(self) -> dict:
-        """ Copy the DictConfig instance, convert it to a normal dict and output """
+        """ Copy the KvConfig instance, convert it to a normal dict and output """
         self_copy = self.deepcopy
         for key, value in self_copy.items():
-            if isinstance(value, DictConfig):
+            if isinstance(value, KvConfig):
                 self_copy[key] = value.__to_container__()
             elif isinstance(value, dict):
-                self_copy[key] = DictConfig(value).__to_container__()
+                self_copy[key] = KvConfig(value).__to_container__()
         return dict(self_copy)

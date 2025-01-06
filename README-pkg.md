@@ -3,26 +3,15 @@
 <!-- markdownlint-disable MD041 -->
 
 <p align="center">
-    <img src="images/logo.png" alt="catenaconf logo" width=200 height=200 />
+    <img src="https://tinypic.host/images/2025/01/06/-2025-01-06-03231131.png" alt="catenaconf logo" width=200 height=200 />
 </p>
 <h1 align="center">CatenaConf</h1>
 
 <p align="center">
-    <a href="https://codecov.io/github/Asianfleet/catenaconf">
-        <img src="https://codecov.io/github/Asianfleet/catenaconf/graph/badge.svg?token=NK7VA3RR1G" alt="Codecov">
+    <a href="https://pypi.org/project/pyecharts">
+        <img src="https://img.shields.io/pypi/format/pyecharts.svg" alt="PyPI - Format">
     </a>
-    <a href="https://img.shields.io/pypi/v/catenaconf">
-        <img src="https://img.shields.io/pypi/v/catenaconf" alt="Package version">
-    </a>
-    <a href="https://pypi.org/project/catenaconf/">
-        <img src="https://img.shields.io/pypi/pyversions/catenaconf" alt="PyPI - Python Version">
-    </a>
-</p>
-<p align="center">
-    <a href="https://pypi.org/project/catenaconf/">
-        <img src="https://img.shields.io/pypi/wheel/catenaconf" alt="PyPI - Format">
-    </a>
-    <a href="https://github.com/Asianfleet/catenaconf/actions">
+    <a href="https://github.com/pyecharts/pyecharts/pulls">
         <img src="https://img.shields.io/github/actions/workflow/status/Asianfleet/catenaconf/main.yaml" alt="build passing">
     </a>
     <a href="https://opensource.org/license/apache-2-0">
