@@ -16,15 +16,9 @@ class DictConfig(dict):
     def __getattr__(self, key):
         """ Get the value of the key """
         
-        """
-        The following two lines address such a situation:
-        test = {"__class__": "test"}
-        dt = DictConfig(test)
-        At this time, dt.__class__ will return DictConfig instead of test.
-        This is to ensure that special attributes cannot be used as key names.
-        """
-        if key.startswith('__') and key.endswith('__'):
-            return super().__getattr__(key)
+        # Till now I couldn't figure out the meaning of the following two lines of code
+        """ if key.startswith('__') and key.endswith('__'):
+            return super().__getattr__(key) """
 
         try:
             value = self[key]

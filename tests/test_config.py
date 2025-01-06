@@ -28,9 +28,10 @@ class TestDictConfig(BaseCatenaconfTestCase):
         
     def test_set_underlined_key(self):
         self.dt.__a__ = "a"
+        self.dt.__b__ = "b"
         self.dt.b = {"c": "d"}
         self.dt.e = [1, 2, 3]
-        del self.dt.e
+        del self.dt.__b__
         self.dt.__to_container__()
         self.assertEqual(self.dt.__a__, "a")
         self.assertEqual(type(self.dt.__container__), dict)
@@ -172,5 +173,5 @@ class TestDictConfigMethods(BaseCatenaconfTestCase):
         self.assertIn("config.database.port", refs)
 
 
-if __name__ == '__main__':
-    unittest.main()
+""" if __name__ == '__main__':
+    unittest.main() """
