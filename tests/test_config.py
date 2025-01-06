@@ -19,11 +19,31 @@ class BaseCatenaconfTestCase(unittest.TestCase):
         self.dt = Catenaconf.create(self.test_config)
 
 
+class TestDictConfig(BaseCatenaconfTestCase):
+    """ test the DictConfig class """
+    def test_get_underlined_key(self):
+        test = {"__class__": "test"}
+        dt = DictConfig(test)
+        self.assertEqual(dt.__class__, DictConfig)
+        
+    def test_set_underlined_key(self):
+        self.dt.__a__ = "a"
+        self.dt.b = {"c": "d"}
+        self.dt.e = [1, 2, 3]
+        del self.dt.e
+        self.dt.__to_container__()
+        self.assertEqual(self.dt.__a__, "a")
+        self.assertEqual(type(self.dt.__container__), dict)
+  
 class TestCatenaconfCreation(BaseCatenaconfTestCase):
     """ test the creation of Catenaconf """
     def test_create(self):
         self.assertIsInstance(self.dt, DictConfig)
-
+        
+    def test_create_with__list(self):
+        dt = Catenaconf.create({"test": [1, 2, 3]})
+        self.assertIsInstance(dt, DictConfig)
+        
 
 class TestCatenaconfResolution(BaseCatenaconfTestCase):
     """ test the resolution of Catenaconf """

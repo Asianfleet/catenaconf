@@ -11,9 +11,21 @@ class DictConfig(dict):
             elif isinstance(value, list):
                 self[key] = [DictConfig(item) if isinstance(item, dict) else item for item in value]
 
+    # TODO: the DictConfig class may have special attributes with underlines, 
+    # which can't accessd by super().__getattr__(key)
     def __getattr__(self, key):
+        """ Get the value of the key """
+        
+        """
+        The following two lines address such a situation:
+        test = {"__class__": "test"}
+        dt = DictConfig(test)
+        At this time, dt.__class__ will return DictConfig instead of test.
+        This is to ensure that special attributes cannot be used as key names.
+        """
         if key.startswith('__') and key.endswith('__'):
             return super().__getattr__(key)
+
         try:
             value = self[key]
             # Return directly (the init function ensures that it is already of DictConfig type)
@@ -22,6 +34,9 @@ class DictConfig(dict):
             raise AttributeError(f"'{type(self).__name__}' object has no attribute '{key}'")
 
     def __setattr__(self, key, value):
+        """ Set the value of the key """
+        
+        # make sure the special attributes are not overwritten by the key-value pair
         if key.startswith('__') and key.endswith('__'):
             super().__setattr__(key, value)
         else: 
