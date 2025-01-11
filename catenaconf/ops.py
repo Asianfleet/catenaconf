@@ -67,6 +67,7 @@ class Catenaconf:
             merge_into(merged_config, KvConfig(config))
         return KvConfig(merged_config)
 
+    # TODO: Consider the case of referencing an element in a list
     @staticmethod
     def resolve(cfg: KvConfig) -> None:
         capture_pattern = r'@\{(.*?)\}'
