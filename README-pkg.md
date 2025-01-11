@@ -31,6 +31,8 @@ CatenaConf is a lightweight Python library designed for managing and operating c
 - Flexible update and merge mechanisms.
 - Ability to reference other configuration values within configuration values.
 
+---
+
 ## Installation
 
 Install using pip:
@@ -42,6 +44,8 @@ pip install catenaconf
 ## Usage
 
 ### Creating Configuration
+
+#### From `dict` object
 
 ```python
 from catenaconf import Catenaconf
@@ -58,6 +62,54 @@ cfg = Catenaconf.create(config)
 
 - Use the `Catenaconf.create` method to create a configuration from a dictionary.
 - The method returns a `KvConfig` instance.
+
+#### `load` Function
+
+```python
+Catenaconf.load(file)
+```
+
+**Description:** Load a KvConfig instance from a file or input stream. Supports JSON, YAML, and XML formats.
+
+**Parameters:**
+
+- `file (str | pathlib.Path)`: Path to the configuration file.
+
+**Usage:**
+
+```python
+cfg = Catenaconf.load("config.json")
+```
+
+**Returns:**
+
+- Returns a `KvConfig` object created from the loaded data.
+
+#### `structured` Function
+
+```python
+Catenaconf.structured(model)
+```
+
+**Description:** Creates a `KvConfig` instance from a Pydantic model.
+
+**Parameters:**
+
+- `model (pydantic.BaseModel)`: A Pydantic model object to construct the configuration.
+
+**Usage:**
+
+```python
+from pydantic import BaseModel
+
+class MyModel(BaseModel):
+    field: str
+cfg = Catenaconf.structured(MyModel(field="value"))
+```
+
+**Returns:**
+
+- A `KvConfig` object containing the structured configuration.
 
 ### Updating Configuration
 
