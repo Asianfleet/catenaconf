@@ -71,7 +71,7 @@ class Catenaconf:
     def resolve(cfg: KvConfig) -> None:
         capture_pattern = r'@\{(.*?)\}'
         def de_ref(captured):
-            ref:str = captured.group(1)
+            ref: str = captured.group(1)
             target = cfg
             for part in ref.split("."):
                 target = target[part]

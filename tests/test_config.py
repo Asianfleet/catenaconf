@@ -320,5 +320,5 @@ class TestCatenaconfLoad(unittest.TestCase):
         self.assertEqual(config["services"]["service"][0]["name"], "auth")
         self.assertEqual(config["services"]["service"][1]["port"], "8082")
 
-if __name__ == '__main__':
-    unittest.main()
+""" if __name__ == '__main__':
+    unittest.main() """
