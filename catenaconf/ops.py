@@ -27,6 +27,49 @@ class Catenaconf:
         return KvConfig(model.model_dump())
 
     @staticmethod
+    def load(file: Union[str, Path]) -> KvConfig:
+        """
+        Load a KvConfig instance from a file or input stream.
+        
+        Supports JSON, YAML, XML, and CSV formats. 
+        """
+        
+        try:
+            import yaml
+        except ImportError:
+            raise ImportError("YAML is not installed. Please install it with `pip install pyyaml`.")
+        
+        path = Path(file)
+        if not path.exists():
+            raise FileNotFoundError(f"File {path} does not exist.")
+        
+        # 首先检查文件扩展名
+        suffix = path.suffix.lower()
+        if suffix not in ['.json', '.yaml', '.yml', '.xml']:
+            raise UnsupportedFormatError(f"Unsupported file format: {suffix}")
+        
+        # 读取文件内容
+        content = path.read_text(encoding='utf-8').strip()
+        
+        # 处理空文件
+        if not content:
+            return KvConfig({})
+        
+        # 根据文件类型解析内容
+        try:
+            if suffix == '.json':
+                config = json.loads(content)
+            elif suffix in ['.yaml', '.yml']:
+                config = yaml.safe_load(content)
+            else:  # .xml
+                root = ET.fromstring(content)
+                config = Catenaconf._xml_to_dict(root)
+                
+            return KvConfig(config)
+        except (json.JSONDecodeError, yaml.YAMLError, ET.ParseError) as e:
+            raise UnsupportedFormatError(f"Failed to parse {suffix} file: {str(e)}")
+
+    @staticmethod
     def update(cfg: KvConfig, key: str, value: Any = None, *, merge: bool = True) -> None:
         keys = key.split('.')
         current = cfg
@@ -100,49 +143,6 @@ class Catenaconf:
             return cfg_copy.__to_container__()
         else:
             return cfg.__to_container__()
-
-    @staticmethod
-    def load(file: Union[str, Path]) -> KvConfig:
-        """
-        Load a KvConfig instance from a file or input stream.
-        
-        Supports JSON, YAML, XML, and CSV formats. 
-        """
-        
-        try:
-            import yaml
-        except ImportError:
-            raise ImportError("YAML is not installed. Please install it with `pip install pyyaml`.")
-        
-        path = Path(file)
-        if not path.exists():
-            raise FileNotFoundError(f"File {path} does not exist.")
-        
-        # 首先检查文件扩展名
-        suffix = path.suffix.lower()
-        if suffix not in ['.json', '.yaml', '.yml', '.xml']:
-            raise UnsupportedFormatError(f"Unsupported file format: {suffix}")
-        
-        # 读取文件内容
-        content = path.read_text(encoding='utf-8').strip()
-        
-        # 处理空文件
-        if not content:
-            return KvConfig({})
-        
-        # 根据文件类型解析内容
-        try:
-            if suffix == '.json':
-                config = json.loads(content)
-            elif suffix in ['.yaml', '.yml']:
-                config = yaml.safe_load(content)
-            else:  # .xml
-                root = ET.fromstring(content)
-                config = Catenaconf._xml_to_dict(root)
-                
-            return KvConfig(config)
-        except (json.JSONDecodeError, yaml.YAMLError, ET.ParseError) as e:
-            raise UnsupportedFormatError(f"Failed to parse {suffix} file: {str(e)}")
 
     @staticmethod
     def _xml_to_dict(element: ET.Element) -> dict:

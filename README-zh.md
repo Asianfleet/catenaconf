@@ -32,19 +32,21 @@
 
 ## 简介
 
-CatenaConf 是一个可用于管理和操作配置的极轻量 Python 库。它基于对 Python 字典类型的扩展，使用键值对管理配置，并提供灵活的操作功能。
+CatenaConf 是一个轻量级的 Python 库，专为管理和操作配置而设计。它扩展了 Python 字典类型，使用键值对管理配置，并提供灵活的操作功能。
 
 ## 特性
 
-- 轻量级：仅依赖 Python 标准库，不依赖其他第三方库。
-- 基于 Python 字典创建配置
-- 通过属性访问与修改配置值
-- 灵活的更新与合并机制
-- 可在配置值中引用其他配置值
+- 轻量级：仅依赖于 Python 标准库，无需任何第三方依赖。
+- 基于 Python 字典来创建配置。
+- 可以通过属性访问和修改配置值。
+- 提供灵活的更新与合并机制。
+- 支持在配置值中引用其他配置值。
+
+---
 
 ## 安装
 
-使用 pip 安装：
+通过 pip 安装：
 
 ```bash
 pip install catenaconf
@@ -53,6 +55,20 @@ pip install catenaconf
 ## 使用方法
 
 ### 创建配置
+
+#### 从字典创建
+
+```python
+Catenaconf.create(config)
+```
+
+**描述：** 从字典创建一个 `KvConfig` 实例（库内置类型之一）。
+
+**参数：**
+
+- `config (dict)`：包含配置数据的字典。
+
+**用法：**
 
 ```python
 from catenaconf import Catenaconf
@@ -67,22 +83,95 @@ config = {
 cfg = Catenaconf.create(config)
 ```
 
-- 使用 `Catenaconf.create` 方法从字典创建配置
-- 方法返回一个 `KvConfig` 实例
+#### 从文件加载
+
+```python
+Catenaconf.load(file)
+```
+
+**描述：** 从文件或输入流加载一个 `KvConfig` 实例。支持 JSON，YAML 和 XML 格式。
+
+**参数：**
+
+- `file (str | pathlib.Path)`：配置文件路径。
+
+**用法：**
+
+```python
+cfg = Catenaconf.load("config.json")
+```
+
+**返回：**
+
+- 返回一个由加载数据创建的 `KvConfig` 对象。
+
+#### 从 Pydantic 模型创建
+
+```python
+Catenaconf.structured(model)
+```
+
+**描述：** 从一个 Pydantic 模型创建一个 `KvConfig` 实例。
+
+**参数：**
+
+- `model (pydantic.BaseModel)`：用于构建配置的 Pydantic 模型对象。
+
+**用法：**
+
+```python
+from pydantic import BaseModel
+
+class MyModel(BaseModel):
+    field: str
+cfg = Catenaconf.structured(MyModel(field="value"))
+```
+
+**返回：**
+
+- 一个包含结构化配置的 `KvConfig` 对象。
 
 ### 更新配置
 
 ```python
-Catenaconf.update(cfg, "database.user", "root") # 将在 database 中添加 user 键值对
-Catenaconf.update(cfg, "database", {"root": "root"}) # 将 database 的值替换为 {"root": "root"}
-Catenaconf.update(cfg, "database", {"root": "root"}, merge = True) # 在 database 中添加 root 键值对
+Catenaconf.update(cfg, key, value=None, *, merge=True)
 ```
 
-- 使用 `Catenaconf.update` 方法更新配置
-- 第一个参数为待更新的 `KvConfig` 实例， 第二个参数用于指定要更新的值对应的位置，第三个参数为新值，第四个参数（merge）为是否合并
-- merge 参数：默认为 True， 当为 True 时，如果新值与原有值均为键值对，则会将新值与原有值进行合并而不是直接替换原有值。当为 False 时，新值将直接替换原有值。
+**描述：** 更新配置中指定键的值。
+
+**参数：**
+
+- `cfg (KvConfig)`：待更新的配置实例。
+- `key (str)`：要更新值的位置，使用点号分隔的字符串。
+- `value (Any, optional)`：新的值。
+- `merge (bool, optional)`：是否合并字典。默认为 `True`。
+
+**用法：**
+
+```python
+Catenaconf.update(cfg, "database.user", "root")
+Catenaconf.update(cfg, "database", {"root": "root"})
+Catenaconf.update(cfg, "database", {"root": "root"}, merge=True)
+```
+
+**注意：**
+
+- 如果 `merge=True`，现有字典会与新值合并。
+- 如果 `merge=False`，新值将取代现有值。
 
 ### 合并配置
+
+```python
+Catenaconf.merge(*configs)
+```
+
+**描述：** 将多个配置合并为一个。
+
+**参数：**
+
+- `*configs (KvConfig or dict)`：待合并的配置，作为位置参数传递。
+
+**用法：**
 
 ```python
 config1 = {"database": {"host": "localhost"}}
@@ -91,14 +180,27 @@ config2 = {"database": {"port": 3306}}
 merged_cfg = Catenaconf.merge(config1, config2)
 ```
 
-- 使用 `Catenaconf.merge` 方法合并多个配置
-- 返回一个合并后的 `KvConfig` 实例
+**返回：**
+
+- 一个合并后的 `KvConfig` 实例。
 
 ### 引用与解析引用
 
 ```python
+Catenaconf.resolve(cfg)
+```
+
+**描述：** 解析配置中的所有引用。引用以 `@{}` 格式定义。
+
+**参数：**
+
+- `cfg (KvConfig)`：包含引用的配置实例。
+
+**用法：**
+
+```python
 config = {
-    "info":{
+    "info": {
         "path": "/data",
         "filename": "a.txt"
     },
@@ -109,15 +211,31 @@ cfg = Catenaconf.create(config)
 Catenaconf.resolve(cfg)
 ```
 
-- 使用 `@{}` 格式引用其他配置值
-- 使用 `Catenaconf.resolve` 方法解析配置中的引用：
+**注意：**
+
+- 通过将占位符替换为实际值进行引用解析。
 
 ### 转换为字典
 
 ```python
-dict_config = Catenaconf.to_container(cfg, resolve = True)
-dict_config = Catenaconf.to_container(cfg, resolve = False) # 此时内部的引用不会被解析
+Catenaconf.to_container(cfg, resolve=True)
 ```
 
-- 使用 `Catenaconf.to_container` 方法将 `KvConfig` 实例转换为普通字典
-- resolve 参数：默认为 True， 当为 True 时，内部的引用会被解析，当为 False 时，内部的引用不会被解析
+**描述：** 将 `KvConfig` 实例转换为标准字典。
+
+**参数：**
+
+- `cfg (KvConfig)`：待转换的配置实例。
+- `resolve (bool, optional)`：是否解析字典中的引用。默认为 `True`。
+
+**用法：**
+
+```python
+dict_config = Catenaconf.to_container(cfg, resolve=True)
+dict_config = Catenaconf.to_container(cfg, resolve=False)
+```
+
+**注意：**
+
+- 当 `resolve=True` 时，配置中的所有引用将被解析。
+- 当 `resolve=False` 时，引用将保持未解析状态。

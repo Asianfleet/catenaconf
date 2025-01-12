@@ -12,7 +12,7 @@ with open("requirements.txt") as f:
     
 setup(
     name="catenaconf",
-    version="0.1.2.1",
+    version="0.1.3",
     packages=find_packages(),
     install_requires=required,
     description="A python configuration management library based on dict, with similar grammar as omegaconf",
