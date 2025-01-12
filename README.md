@@ -38,11 +38,11 @@ CatenaConf is a lightweight Python library designed for managing and operating c
 
 ## Features
 
-- Lightweight: Depends only on the Python standard library, without any third-party dependencies.
-- Based on Python dictionaries to create configurations.
-- Access and modify configuration values via attributes.
-- Flexible update and merge mechanisms.
-- Ability to reference other configuration values within configuration values.
+- Lightweight: The code size is small and no third-party dependencies need to be installed (if you need to create a configuration from a Pydantic model or a yaml file, you need to install the corresponding dependencies).
+- Dictionary based: Use Python dictionaries to create and manage configurations.
+- Attribute access: Access and modify configuration values ​​through attributes, which is convenient and intuitive.
+- Flexible update mechanism: Provides flexible update function and supports merging dictionaries.
+- Reference resolution: Supports referencing other configuration values ​​in configuration values ​​and being able to resolve these references.
 
 ---
 
@@ -69,6 +69,10 @@ Catenaconf.create(config)
 **Parameters:**
 
 - `config (dict)`: A dictionary containing the configuration data.
+
+**Returns:**
+
+- Returns a `KvConfig` object created from the dictionary.
 
 **Usage:**
 
@@ -97,15 +101,15 @@ Catenaconf.load(file)
 
 - `file (str | pathlib.Path)`: Path to the configuration file.
 
+**Returns:**
+
+- Returns a `KvConfig` object created from the loaded data.
+
 **Usage:**
 
 ```python
 cfg = Catenaconf.load("config.json")
 ```
-
-**Returns:**
-
-- Returns a `KvConfig` object created from the loaded data.
 
 #### Create from Pydantic Model
 
@@ -119,6 +123,10 @@ Catenaconf.structured(model)
 
 - `model (pydantic.BaseModel)`: A Pydantic model object to construct the configuration.
 
+**Returns:**
+
+- A `KvConfig` object containing the structured configuration.
+
 **Usage:**
 
 ```python
@@ -129,9 +137,31 @@ class MyModel(BaseModel):
 cfg = Catenaconf.structured(MyModel(field="value"))
 ```
 
+### Selecting Configuration Values
+
+```python
+Catenaconf.select(cfg, key, *, default="NOT FOUND", throw_on_resolution_failure=True, throw_on_missing=False)
+```
+
+**Description:** Selects a value from the configuration by key, with options for default values and error handling.
+
+**Parameters:**
+
+- `cfg (KvConfig)`: The configuration instance to select from.
+- `key (str)`: The key to locate within the configuration.
+- `default (Any, optional)`: The default value to return if the key is not found. Defaults to `"NOT FOUND"`.
+- `throw_on_resolution_failure (bool, optional)`: Whether to raise an error if key resolution fails. Defaults to `True`.
+- `throw_on_missing (bool, optional)`: Whether to raise an error for missing keys. Defaults to `False`.
+
 **Returns:**
 
-- A `KvConfig` object containing the structured configuration.
+- The selected value, or the default value if the key is not found.
+
+**Usage:**
+
+```python
+value = Catenaconf.select(cfg, "database.user", default=None, throw_on_resolution_failure=False)
+```
 
 ### Updating Configuration
 
@@ -174,6 +204,10 @@ Catenaconf.merge(*configs)
 
 - `*configs (KvConfig or dict)`: The configurations to merge, passed as positional arguments.
 
+**Returns:**
+
+- A merged `KvConfig` instance.
+
 **Usage:**
 
 ```python
@@ -182,10 +216,6 @@ config2 = {"database": {"port": 3306}}
 
 merged_cfg = Catenaconf.merge(config1, config2)
 ```
-
-**Returns:**
-
-- A merged `KvConfig` instance.
 
 ### References and Resolving References
 
@@ -230,6 +260,10 @@ Catenaconf.to_container(cfg, resolve=True)
 
 - `cfg (KvConfig)`: The configuration instance to convert.
 - `resolve (bool, optional)`: Whether to resolve references in the dictionary. Defaults to `True`.
+
+**Returns:**
+
+- A standard dictionary containing the configuration data.
 
 **Usage:**
 
