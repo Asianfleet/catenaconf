@@ -30,6 +30,8 @@
     </a>
 </p>
 
+[English](README.md) | [中文](README-zh.md)
+
 ## 简介
 
 CatenaConf 是一个轻量级的 Python 库，专为管理和操作配置而设计。它扩展了 Python 字典类型，使用键值对管理配置，并提供灵活的操作功能。

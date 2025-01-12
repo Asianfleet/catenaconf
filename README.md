@@ -30,6 +30,8 @@
     </a>
 </p>
 
+[English](README.md) | [中文](README-zh.md)
+
 ## Introduction
 
 CatenaConf is a lightweight Python library designed for managing and operating configurations. It extends the Python dictionary type to manage configurations using key-value pairs and provides flexible operation functionalities.
