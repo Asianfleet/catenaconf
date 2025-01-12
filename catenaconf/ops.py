@@ -2,7 +2,7 @@ import re
 import json
 from pathlib import Path
 from pydantic import BaseModel
-from typing import Any, IO, Union
+from typing import Any, Union
 import xml.etree.ElementTree as ET
 
 from .catena_config.kvconfig import KvConfig
@@ -120,7 +120,7 @@ class Catenaconf:
             for part in ref.split("."):
                 target = target[part]
             return str(target)
-        def sub_resolve(input_: KvConfig | list):
+        def sub_resolve(input_: Union[KvConfig, list]):
             for key, value in input_.items():
                 if isinstance(value, KvConfig):
                     sub_resolve(value)
