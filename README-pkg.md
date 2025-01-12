@@ -78,7 +78,7 @@ cfg = Catenaconf.create(config)
 Catenaconf.load(file)
 ```
 
-**Description:** Load a KvConfig instance from a file or input stream. Supports JSON, YAML, and XML formats.
+**Description:** Load a KvConfig instance from a file. Supports JSON, YAML, and XML formats.
 
 **Parameters:**
 

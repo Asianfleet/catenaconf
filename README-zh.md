@@ -91,7 +91,7 @@ cfg = Catenaconf.create(config)
 Catenaconf.load(file)
 ```
 
-**描述：** 从文件或输入流加载一个 `KvConfig` 实例。支持 JSON，YAML 和 XML 格式。
+**描述：** 从文件加载一个 `KvConfig` 实例。支持 JSON，YAML 和 XML 格式。
 
 **参数：**
 
