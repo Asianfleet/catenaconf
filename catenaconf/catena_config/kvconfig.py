@@ -1,5 +1,6 @@
-import copy
 import re
+import copy
+from typing import List
 
 class KvConfig(dict):
     def __init__(self, *args, **kwargs):
@@ -8,7 +9,7 @@ class KvConfig(dict):
         for key, value in self.items():
             if isinstance(value, dict):
                 self[key] = KvConfig(value)
-            elif isinstance(value, list):
+            elif isinstance(value, List):
                 self[key] = [KvConfig(item) if isinstance(item, dict) else item for item in value]
 
     # TODO: the KvConfig class may have special attributes with underlines, 
@@ -37,7 +38,7 @@ class KvConfig(dict):
             # Ensure that after adding new attributes, they will also be converted to KvConfig type
             if isinstance(value, dict):
                 value = KvConfig(value)
-            elif isinstance(value, list):
+            elif isinstance(value, List):
                 value = [KvConfig(item) if isinstance(item, dict) else item for item in value]
         
             self[key] = value

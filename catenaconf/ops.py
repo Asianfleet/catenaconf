@@ -1,8 +1,13 @@
 import re
 import json
 from pathlib import Path
-from typing import Any, Union
 import xml.etree.ElementTree as ET
+from typing import (
+    Any, 
+    List, 
+    Union
+)
+
 
 from .catena_config.kvconfig import KvConfig
 
@@ -173,7 +178,7 @@ class Catenaconf:
                 return str(target)
             except (KeyError, TypeError) as e:
                 raise ResolveError(f"Error resolving reference '{captured.group(0)}': {e}")
-        def sub_resolve(input_: Union[KvConfig, list]):
+        def sub_resolve(input_: Union[KvConfig, List]):
             for key, value in input_.items():
                 if isinstance(value, KvConfig):
                     sub_resolve(value)
@@ -181,7 +186,7 @@ class Catenaconf:
                     if re.search(capture_pattern, value):
                         content = re.sub(capture_pattern, de_ref, value)
                         input_[key] = content
-                elif isinstance(value, list):
+                elif isinstance(value, List):
                     for item in value:
                         sub_resolve(item)
                         
@@ -207,7 +212,7 @@ class Catenaconf:
         for child in element:
             child_result = Catenaconf._xml_to_dict(child)
             if child.tag in result:
-                if not isinstance(result[child.tag], list):
+                if not isinstance(result[child.tag], List):
                     result[child.tag] = [result[child.tag]]
                 result[child.tag].append(child_result)
             else:
