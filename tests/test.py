@@ -5,8 +5,11 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 import tempfile
 import os
+
+# python -m unittest discover -s tests
+
 from catenaconf import Catenaconf, KvConfig
-from catenaconf.ops import UnsupportedFormatError
+from catenaconf.ops import UnsupportedFormatError, ResolveError
 
 class BaseCatenaconfTestCase(unittest.TestCase):
     def setUp(self):
@@ -59,6 +62,38 @@ class TestCatenaconfCreation(BaseCatenaconfTestCase):
         self.assertIsInstance(dt, KvConfig)
         
 
+class TestCatenaconfSelect(BaseCatenaconfTestCase):
+
+    def test_select_success(self):
+        value = Catenaconf.select(self.dt, "config.database.host")
+        self.assertEqual(value, "localhost")
+
+        value = Catenaconf.select(self.dt, "app.info")
+        self.assertEqual(value, "App Version: 1.0.0, Connection: Host: localhost, Port: 5432")
+
+    def test_select_default_value(self):
+        value = Catenaconf.select(self.dt, "non.existent.key", default="default_value")
+        self.assertEqual(value, "default_value")
+
+    def test_select_throw_on_missing(self):
+        with self.assertRaises(KeyError):
+            Catenaconf.select(self.dt, "non.existent.key", throw_on_missing=True)
+
+    def test_select_throw_on_resolution_failure(self):
+        invalid_config = {
+            "config": {
+                "database": {
+                    "host": "localhost",
+                    "port": 5432
+                },
+                "connection": "Host: @{config.database.host}, Port: @{config.database.non_existent_port}"
+            }
+        }
+        dt = Catenaconf.create(invalid_config)
+        with self.assertRaises(ResolveError):
+            Catenaconf.select(dt, "config.connection", throw_on_resolution_failure=True)
+
+
 class TestCatenaconfResolution(BaseCatenaconfTestCase):
     """ test the resolution of Catenaconf """
     def test_resolve(self):
@@ -71,6 +106,21 @@ class TestCatenaconfResolution(BaseCatenaconfTestCase):
         Catenaconf.update(self.dt, "config.database.host", "127.0.0.1")
         Catenaconf.resolve(self.dt)
         self.assertEqual(self.dt["config"]["connection"], "Host: 127.0.0.1, Port: 5432")
+        
+    def test_resolve_failure(self):
+        invalid_config = {
+            "config": {
+                "database": {
+                    "host": "localhost",
+                    "port": 5432
+                },
+                "connection": "Host: @{config.database.host}, Port: @{config.database.non_existent_port}"
+            }
+        }
+        dt = Catenaconf.create(invalid_config)
+        with self.assertRaises(ResolveError):
+            Catenaconf.resolve(dt)
+
 
 class TestCatenaconfUpdate(BaseCatenaconfTestCase):
     """ test the update of Catenaconf """
@@ -320,5 +370,5 @@ class TestCatenaconfLoad(unittest.TestCase):
         self.assertEqual(config["services"]["service"][0]["name"], "auth")
         self.assertEqual(config["services"]["service"][1]["port"], "8082")
 
-""" if __name__ == '__main__':
-    unittest.main() """
+if __name__ == '__main__':
+    unittest.main()

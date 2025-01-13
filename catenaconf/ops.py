@@ -1,16 +1,10 @@
 import re
 import json
 from pathlib import Path
-from pydantic import BaseModel
 from typing import Any, Union
 import xml.etree.ElementTree as ET
 
 from .catena_config.kvconfig import KvConfig
-
-try:
-    from pydantic import BaseModel
-except ImportError:
-    raise ImportError("Pydantic is not installed. Please install it with `pip install pydantic`.")
 
 class UnsupportedFormatError(Exception):
     """Raised when the file format is unsupported or the content cannot be parsed."""
@@ -25,8 +19,16 @@ class Catenaconf:
         return KvConfig(config)
 
     @staticmethod
-    def structured(model: BaseModel) -> KvConfig:
+    def structured(model) -> KvConfig:
         """ Creates a KvConfig instance from a Pydantic model """
+        try:
+            from pydantic import BaseModel
+        except ImportError:
+            raise ImportError("Pydantic is not installed. Please install it with `pip install pydantic`.")
+        
+        if not isinstance(model, BaseModel):
+            raise TypeError("The model must be an instance of BaseModel.")
+        
         return KvConfig(model.model_dump())
 
     @staticmethod
@@ -69,6 +71,7 @@ class Catenaconf:
             try:
                 import yaml
                 config = yaml.safe_load(content)
+                return config
             except ImportError:
                     raise ImportError("YAML is not installed. Please install it with `pip install pyyaml`.")    
             except yaml.YAMLError as e:
@@ -100,7 +103,7 @@ class Catenaconf:
         config = cfg.deepcopy
         
         try:
-            config = cfg.deepcopy()
+            config = cfg.deepcopy
             Catenaconf.resolve(config)  # 可能抛出 ResolveError
         except ResolveError as e:
             if throw_on_resolution_failure:
