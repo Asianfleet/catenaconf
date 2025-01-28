@@ -4,3 +4,4 @@ build/
 dist/
 catenaconf.egg-info/
 .pypirc
+out/
