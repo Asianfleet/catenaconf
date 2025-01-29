@@ -76,7 +76,7 @@ class Catenaconf:
             try:
                 import yaml
                 config = yaml.safe_load(content)
-                return config
+                return KvConfig(config)
             except ImportError:
                     raise ImportError("YAML is not installed. Please install it with `pip install pyyaml`.")    
             except yaml.YAMLError as e:
