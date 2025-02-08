@@ -137,6 +137,30 @@ class MyModel(BaseModel):
 cfg = Catenaconf.structured(MyModel(field="value"))
 ```
 
+### 访问配置
+
+创建完配置后，可以通过属性方式访问配置值：
+
+```python
+from catenaconf import Catenaconf
+
+config = {
+  "database": {
+    "host": "localhost",
+    "port": 3306
+  }
+}
+
+cfg = Catenaconf.create(config)
+
+# 通过属性访问
+host = cfg.database.host  
+port = cfg.database.port
+
+print(host)  # 输出: localhost
+print(port)  # 输出: 3306
+```
+
 ### 选择配置值
 
 ```python

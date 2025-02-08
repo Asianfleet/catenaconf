@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "catenaconf"
-version = "0.1.4"
+version = "0.1.5"
 description = "A configuration management library"
 authors = [
     { name = "Jianqing Wang", email = "18353419066@163.com" }

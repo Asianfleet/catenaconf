@@ -124,6 +124,30 @@ class MyModel(BaseModel):
 cfg = Catenaconf.structured(MyModel(field="value"))
 ```
 
+### Accessing Configuration
+
+After creating a configuration, you can access configuration values using attribute access:
+
+```python
+from catenaconf import Catenaconf
+
+config = {
+  "database": {
+    "host": "localhost",
+    "port": 3306
+  }
+}
+
+cfg = Catenaconf.create(config)
+
+# Accessing via attribute
+host = cfg.database.host  
+port = cfg.database.port
+
+print(host)  # Output: localhost
+print(port)  # Output: 3306
+```
+
 ### Selecting Configuration Values
 
 ```python
