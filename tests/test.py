@@ -385,10 +385,13 @@ class TestCatenaconfSpecial(unittest.TestCase):
                 "11", 
                 "22",
                 "33",
-                "@{env:MY_VARIABLE}"    
+                "@{env:MY_VARIABLE}",    
+                {"a": "b"},
+                2,
+                2
             ],
             "list":[
-                {"a": 1, "b": "@{app.1}"},
+                {"a": 1, "b": "@{app.5}"},
                 {"ref": "@{config.database.host}"}
             ]
         }
@@ -396,7 +399,7 @@ class TestCatenaconfSpecial(unittest.TestCase):
         
     def test_resolve_list(self):
         Catenaconf.resolve(self.dt)
-        self.assertEqual(self.dt["list"][0]["b"], "22")
+        self.assertEqual(self.dt["list"][0]["b"], 2)
         
     def test_resolve_env(self):
         os.environ['MY_VARIABLE'] = 'my_value'

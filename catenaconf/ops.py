@@ -185,7 +185,11 @@ class Catenaconf:
                                 )
                         else:
                             target = target[part]
-                    return str(target)
+                    if isinstance(target, int):
+                        target = "@" + str(target) + "@"
+                    else:
+                        target = str(target)
+                    return target
                 elif ref.startswith("env:"):
                     return os.environ.get(ref[4:].upper())
                     
@@ -198,15 +202,21 @@ class Catenaconf:
                 elif isinstance(value, str):
                     if re.search(capture_pattern, value):
                         content = re.sub(capture_pattern, de_ref, value)
+                        if content.endswith("@") and content.startswith("@"):
+                            content = int(content[1:-1])
                         input_[key] = content
                 elif isinstance(value, List):
                     for idx, item in enumerate(value):
                         if isinstance(item, str):
                             if re.search(capture_pattern, item):
                                 content = re.sub(capture_pattern, de_ref, item)
+                                if content.endswith("@") and content.startswith("@"):
+                                    content = int(content[1:-1])
                                 value[idx] = content
-                        else:
+                        elif isinstance(item, (KvConfig, List)):
                             sub_resolve(item)
+                        else:
+                            continue
         try:
             sub_resolve(cfg)
         except ResolveError as e:
