@@ -169,7 +169,7 @@ class Catenaconf:
     # TODO: Consider the case of referencing an element in a list
     @staticmethod
     def resolve(cfg: KvConfig) -> None:
-        capture_pattern = r'@\{(.*?)\}'
+        
         def de_ref(captured):
             try:
                 ref: str = captured.group(1)
@@ -185,34 +185,67 @@ class Catenaconf:
                                 )
                         else:
                             target = target[part]
-                    if isinstance(target, int):
-                        target = "@" + str(target) + "@"
-                    else:
-                        target = str(target)
-                    return target
+                    return str(target)
                 elif ref.startswith("env:"):
                     return os.environ.get(ref[4:].upper())
                     
             except (KeyError, TypeError) as e:
                 raise ResolveError(f"Error resolving reference '{captured.group(0)}': {e}")
+        
+        def interpret(value: str):
+            
+            def is_valid_format(value: str) -> Union[bool, List]:
+                # 定义正则表达式模式
+                pattern = r'^\s*@{([^}]*)}\s*$'
+                match = re.match(pattern, value)
+                # 使用re.match检查字符串是否匹配模式
+                if match:
+                    return [match.group(0), match.group(1)]
+                else:
+                    return False
+            
+            capture_pattern = r'@\{(.*?)\}'
+            if re.search(capture_pattern, value):
+                valid_result = is_valid_format(value)
+                if not valid_result:
+                    return re.sub(capture_pattern, de_ref, value)
+                else:
+                    try:
+                        ref: str = valid_result[1]
+                        target = cfg
+                        if "." in ref:
+                            for part in ref.split("."):
+                                if isinstance(target, List):
+                                    if part.isdigit():
+                                        target = target[int(part)]
+                                    else:
+                                        raise ResolveError((
+                                            f"Error resolving reference '{valid_result[0]}'\n"
+                                            "List index must be an integer"
+                                        ))
+                                else:
+                                    target = target[part]
+                            return target
+                        elif ref.startswith("env:"):
+                            return os.environ.get(ref[4:].upper())
+                            
+                    except (KeyError, TypeError) as e:
+                        raise ResolveError(f"Error resolving reference '{valid_result[0]}': {e}")
+            else:
+                return value      
+        
         def sub_resolve(input_: Union[KvConfig, List]):
             for key, value in input_.items():
                 if isinstance(value, KvConfig):
                     sub_resolve(value)
                 elif isinstance(value, str):
-                    if re.search(capture_pattern, value):
-                        content = re.sub(capture_pattern, de_ref, value)
-                        if content.endswith("@") and content.startswith("@"):
-                            content = int(content[1:-1])
-                        input_[key] = content
+                    content = interpret(value)   
+                    input_[key] = content
                 elif isinstance(value, List):
                     for idx, item in enumerate(value):
                         if isinstance(item, str):
-                            if re.search(capture_pattern, item):
-                                content = re.sub(capture_pattern, de_ref, item)
-                                if content.endswith("@") and content.startswith("@"):
-                                    content = int(content[1:-1])
-                                value[idx] = content
+                            content = interpret(item)
+                            value[idx] = content
                         elif isinstance(item, (KvConfig, List)):
                             sub_resolve(item)
                         else:
@@ -251,4 +284,10 @@ class Catenaconf:
                 return element.text.strip()
         return result
         
-        
+""" if __name__ == "__main__":
+    dict = {
+        "a": "b",
+        "c": "@{a}"
+    }       
+    config = Catenaconf.create(dict)
+    Catenaconf.resolve(config) """

@@ -399,6 +399,7 @@ class TestCatenaconfSpecial(unittest.TestCase):
         
     def test_resolve_list(self):
         Catenaconf.resolve(self.dt)
+        print(self.dt)
         self.assertEqual(self.dt["list"][0]["b"], 2)
         
     def test_resolve_env(self):
