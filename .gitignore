@@ -5,3 +5,4 @@ dist/
 catenaconf.egg-info/
 .pypirc
 out/
+.coverage

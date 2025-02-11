@@ -247,21 +247,39 @@ merged_cfg = Catenaconf.merge(config1, config2)
 Catenaconf.resolve(cfg)
 ```
 
-**Description:** Resolves all references in the configuration. References are defined with the `@{}` format.
+**Description:** Resolve all references in the configuration. The reference is defined in the `@{}` format.
 
-**Parameters:**
+- `@{a.b.c}` : Reference keys in configuration. where `a` is the top-level key of the configuration, `b` is the sub-key of `a`, and `c` is the sub-key of `b`.
+  
+- `@{a.b.1}`: Reference elements in the list. where `a` is the top-level key of the configuration, `b` is the sub-key of `a`, and `1` is the index of `b`.
 
-- `cfg (KvConfig)`: The configuration instance containing the references.
+- `@{env:VAR_NAME}`: Reference environment variables.
+
+**Parameter:**
+
+- `cfg (KvConfig)`: Contains the referenced configuration instance.
 
 **Usage:**
 
 ```python
 config = {
-    "info": {
-        "path": "/data",
-        "filename": "a.txt"
+    "config": {
+        "database": {
+            "host": "localhost",
+            "port": 5432
+        },
+        "connection": "Host: @{config.database.host}, Port: @{config.database.port}"
     },
-    "backup_path": "@{info.path}/backup/@{info.filename}"
+    "app":[
+        "11", 
+        "22",
+        "33",
+        "@{env:MY_VARIABLE}"    
+    ],
+    "list":[
+        {"a": 1, "b": "@{app.1}"},
+        {"ref": "@{config.database.host}"}
+    ]
 }
 
 cfg = Catenaconf.create(config)

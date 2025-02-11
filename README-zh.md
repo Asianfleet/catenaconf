@@ -248,6 +248,9 @@ Catenaconf.resolve(cfg)
 ```
 
 **描述:** 解析配置中的所有引用。引用定义为 `@{}` 格式。
+    - `@{a.b.c}`: 引用配置中的键。其中 `a` 是配置的顶级键，`b` 是 `a` 的子键，`c` 是 `b` 的子键。
+    - `@{a.b.1}`: 引用列表中的元素。其中 `a` 是配置的顶级键，`b` 是 `a` 的子键，`1` 是 `b` 的索引。
+    - `@{env:VAR_NAME}`: 引用环境变量。
 
 **参数:**
 
@@ -257,11 +260,23 @@ Catenaconf.resolve(cfg)
 
 ```python
 config = {
-    "info": {
-        "path": "/data",
-        "filename": "a.txt"
+    "config": {
+        "database": {
+            "host": "localhost",
+            "port": 5432
+        },
+        "connection": "Host: @{config.database.host}, Port: @{config.database.port}"
     },
-    "backup_path": "@{info.path}/backup/@{info.filename}"
+    "app":[
+        "11", 
+        "22",
+        "33",
+        "@{env:MY_VARIABLE}"    
+    ],
+    "list":[
+        {"a": 1, "b": "@{app.1}"},
+        {"ref": "@{config.database.host}"}
+    ]
 }
 
 cfg = Catenaconf.create(config)

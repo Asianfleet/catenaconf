@@ -370,5 +370,39 @@ class TestCatenaconfLoad(unittest.TestCase):
         self.assertEqual(config["services"]["service"][0]["name"], "auth")
         self.assertEqual(config["services"]["service"][1]["port"], "8082")
 
+
+class TestCatenaconfSpecial(unittest.TestCase):
+    def setUp(self):
+        self.test_config = {
+            "config": {
+                "database": {
+                    "host": "localhost",
+                    "port": 5432
+                },
+                "connection": "Host: @{config.database.host}, Port: @{config.database.port}"
+            },
+            "app":[
+                "11", 
+                "22",
+                "33",
+                "@{env:MY_VARIABLE}"    
+            ],
+            "list":[
+                {"a": 1, "b": "@{app.1}"},
+                {"ref": "@{config.database.host}"}
+            ]
+        }
+        self.dt = Catenaconf.create(self.test_config)
+        
+    def test_resolve_list(self):
+        Catenaconf.resolve(self.dt)
+        self.assertEqual(self.dt["list"][0]["b"], "22")
+        
+    def test_resolve_env(self):
+        os.environ['MY_VARIABLE'] = 'my_value'
+        Catenaconf.resolve(self.dt)
+        print(self.dt)
+        self.assertEqual(self.dt["app"][3], "my_value")
+    
 if __name__ == '__main__':
     unittest.main()

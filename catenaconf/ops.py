@@ -1,4 +1,5 @@
 import re
+import os
 import json
 from pathlib import Path
 import xml.etree.ElementTree as ET
@@ -173,9 +174,21 @@ class Catenaconf:
             try:
                 ref: str = captured.group(1)
                 target = cfg
-                for part in ref.split("."):
-                    target = target[part]
-                return str(target)
+                if "." in ref:
+                    for part in ref.split("."):
+                        if isinstance(target, List):
+                            if part.isdigit():
+                                target = target[int(part)]
+                            else:
+                                raise ResolveError(
+                                    f"Error resolving reference '{captured.group(0)}': List index must be an integer"
+                                )
+                        else:
+                            target = target[part]
+                    return str(target)
+                elif ref.startswith("env:"):
+                    return os.environ.get(ref[4:].upper())
+                    
             except (KeyError, TypeError) as e:
                 raise ResolveError(f"Error resolving reference '{captured.group(0)}': {e}")
         def sub_resolve(input_: Union[KvConfig, List]):
@@ -187,9 +200,13 @@ class Catenaconf:
                         content = re.sub(capture_pattern, de_ref, value)
                         input_[key] = content
                 elif isinstance(value, List):
-                    for item in value:
-                        sub_resolve(item)
-                        
+                    for idx, item in enumerate(value):
+                        if isinstance(item, str):
+                            if re.search(capture_pattern, item):
+                                content = re.sub(capture_pattern, de_ref, item)
+                                value[idx] = content
+                        else:
+                            sub_resolve(item)
         try:
             sub_resolve(cfg)
         except ResolveError as e:
