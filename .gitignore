@@ -7,3 +7,4 @@ catenaconf.egg-info/
 out/
 .coverage
 build.sh
+test*
